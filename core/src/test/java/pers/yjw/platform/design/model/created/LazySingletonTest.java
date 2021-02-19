@@ -23,7 +23,7 @@ public class LazySingletonTest {
 		LazySingleton newInstance = (LazySingleton)constructor.newInstance();
 
 		System.out.println(newInstance);
- 		System.out.println(instance == newInstance);
+// 		System.out.println(instance == newInstance);
 
 
         // 序列化与反序列化(若不添加readResolve()方法反序列化时不会调用这个类定义的构造函数，会从字节流中拿取数据进行初始化；需要加serialVersionUID保证版本一致
