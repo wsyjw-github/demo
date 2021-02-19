@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+    <!--filter-->
+    <bean id="log-filter" class="com.alibaba.druid.filter.logging.Slf4jLogFilter">
+        <property name="resultSetLogEnabled" value="false"/>
+        <property name="dataSourceLogEnabled" value="false"/>
+        <property name="connectionLogEnabled" value="false"/>
+        <property name="statementExecutableSqlLogEnable" value="false"/>
+    </bean>
+    <bean id="stat-filter" class="com.alibaba.druid.filter.stat.StatFilter">
+        <property name="slowSqlMillis" value="1000"/>
+        <property name="logSlowSql" value="true"/>
+        <property name="mergeSql" value="true"/>
+    </bean>
+    <bean id="wall-filter" class="com.alibaba.druid.wall.WallFilter">
+        <property name="dbType" value="mysql"/>
+        <property name="config" ref="wall-config"/>
+    </bean>
+
+    <bean id="wall-config" class="com.alibaba.druid.wall.WallConfig">
+        <!-- 批量sql -->
+        <property name="multiStatementAllow" value="true"/>
+    </bean>
+
+    <!--datasource-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+        <property name="driverClassName" value="${jdbc.ai_platform_jordan.database.driver}"/>
+        <property name="url" value="${jdbc.ai_platform_jordan.database.url}"/>
+        <property name="username" value="${jdbc.ai_platform_jordan.database.username}"/>
+        <property name="password" value="${jdbc.ai_platform_jordan.database.password}"/>
+        <property name="maxActive" value="${jdbc.ai_platform_jordan.database.maxActive}"/>
+        <property name="initialSize" value="${jdbc.ai_platform_jordan.database.initialSize}"/>
+
+        <property name="maxWait" value="${jdbc.datasource.maxWait}"/>
+        <property name="minIdle" value="${jdbc.datasource.minIdle}"/>
+
+        <property name="timeBetweenEvictionRunsMillis" value="${jdbc.datasource.timeBetweenEvictionRunsMillis}"/>
+        <property name="minEvictableIdleTimeMillis" value="${jdbc.datasource.minEvictableIdleTimeMillis}"/>
+
+        <property name="validationQuery" value="${jdbc.datasource.validationQuery}"/>
+        <property name="testWhileIdle" value="${jdbc.datasource.testWhileIdle}"/>
+        <property name="testOnBorrow" value="${jdbc.datasource.testOnBorrow}"/>
+        <property name="testOnReturn" value="${jdbc.datasource.testOnReturn}"/>
+
+        <property name="poolPreparedStatements" value="${jdbc.datasource.poolPreparedStatements}"/>
+        <property name="maxOpenPreparedStatements" value="${jdbc.datasource.maxOpenPreparedStatements}"/>
+
+        <property name="removeAbandoned" value="${jdbc.datasource.removeAbandoned}"/>
+        <property name="removeAbandonedTimeout" value="${jdbc.datasource.removeAbandonedTimeout}"/>
+        <property name="logAbandoned" value="${jdbc.datasource.logAbandoned}"/>
+
+        <property name="proxyFilters">
+            <list>
+                <ref bean="log-filter"/>
+                <ref bean="wall-filter"/>
+                <ref bean="stat-filter"/>
+            </list>
+        </property>
+    </bean>
+
+    <!--session factory-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation" value="classpath:mybatis/mybatis-config.xml"/>
+        <property name="mapperLocations" value="classpath:mybatis/mapper/*Mapper.xml"/>
+    </bean>
+
+    <!--<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">-->
+        <!--<constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory"></constructor-arg>-->
+        <!--<constructor-arg name="executorType" value="BATCH"></constructor-arg>-->
+    <!--</bean>-->
+
+    <!-- transaction support-->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <tx:annotation-driven transaction-manager="txManager"/>
+
+    <!-- mapper interface -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="pers.yjw.platform.demo.dao"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/>
+    </bean>
+</beans>

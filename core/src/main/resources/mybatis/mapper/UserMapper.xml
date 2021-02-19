@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="pers.yjw.platform.demo.dao.UserDao">
+    <resultMap id="UserResultMap" type="pers.yjw.platform.demo.po.UserEntity">
+        <result property="id" column="id"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="accountName" column="account_name"/>
+        <result property="realName" column="real_name"/>
+        <result property="role" column="role"/>
+        <result property="status" column="status"/>
+        <result property="isDelete" column="is_delete"/>
+        <result property="delTimestamp" column="del_timestamp"/>
+        <result property="gmtCreate" column="gmt_create"/>
+        <result property="gmtModify" column="gmt_modify"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        `id`, `create_by`, `update_by`, `account_name`, `real_name`, `role`, `status`, `is_delete`, `del_timestamp`, `gmt_create`, `gmt_modify`
+    </sql>
+
+    <select id="selectByAccountName" parameterType="java.lang.String" resultMap="UserResultMap">
+        select `id`, `create_by`, `update_by`, `account_name`, `real_name`, `role`, `status`, `is_delete`, `del_timestamp`, `gmt_create`, `gmt_modify`
+        from `user`
+        where `account_name` = #{accountName} and `is_delete` = 0
+    </select>
+
+    <select id="selectById" parameterType="java.lang.Long" resultMap="UserResultMap">
+        select `id`, `create_by`, `update_by`, `account_name`, `real_name`, `role`, `status`, `is_delete`, `gmt_create`, `gmt_modify`
+        from `user`
+        where `id` = #{id}
+    </select>
+
+    <insert id="batchInsert" parameterType="java.util.List" keyProperty="id" useGeneratedKeys="true">
+        insert into `user`
+        (`create_by`,`update_by`,`account_name`, `real_name`, `status`)
+        value
+        <foreach collection="list" index="index" item="item" separator=",">
+            (#{item.createBy}, #{item.updateBy},#{item.accountName},#{item.realName},#{item.status})
+        </foreach>
+    </insert>
+
+    <insert id="insertSelective" parameterType="pers.yjw.platform.demo.po.UserEntity">
+        insert into `user`
+        (
+        `create_by`,
+        `update_by`,
+        `account_name`,
+        `real_name`,
+        `status`
+        )
+        values
+        (
+        #{createBy},
+        #{updateBy},
+        #{accountName},
+        #{realName},
+        #{status}
+        )
+    </insert>
+
+    <update id="updateStatusById" parameterType="java.lang.Long">
+        update `user`
+        set `status` = 2
+        where `id` = #{id}
+    </update>
+
+    <update id="updateRealNameById">
+        update `user`
+        set `real_name` = #{realName}
+        where `id` = #{id}
+    </update>
+
+    <select id="selectByStatus" parameterType="java.lang.Integer" resultMap="UserResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from `user`
+        where `status` = #{status}
+    </select>
+</mapper>
