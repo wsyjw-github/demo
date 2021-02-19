@@ -13,8 +13,8 @@ import java.lang.reflect.InvocationTargetException;
  */
 public class LazySingletonTest {
     public static void main(String[] args) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, IOException, ClassNotFoundException {
-//        LazySingleton instance = LazySingleton.getInstance();
-//        System.out.println(instance);
+        LazySingleton instance = LazySingleton.getInstance();
+        System.out.println(instance);
 
         // 通过反射可调用私有构造方法
 		Class obj = LazySingleton.class;
